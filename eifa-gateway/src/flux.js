@@ -33,6 +33,7 @@ async function getServerResponseTime({ ip, port, count = 5, max = 300_000 }) {
   for (let i = 0; i < count; i++) {
     try {
       const start = Date.now();
+      console.log(`curl to http://${ip}:${port}`);
       await axios.get(`http://${ip}:${port}`, { timeout: max });
       const end = Date.now();
       response_times.push(end - start);
@@ -45,13 +46,13 @@ async function getServerResponseTime({ ip, port, count = 5, max = 300_000 }) {
   return Math.ceil(sum / response_times.length);
 }
 
-function calcMinExpr(servers, min, max) {
-  const anotherMin = servers.reduce((minExpr, server) => {
+function calcMinExp(servers, min, max) {
+  const anotherMin = servers.reduce((minExp, server) => {
     // expire at
-    if (notOr(minExpr, minExpr?.getTime() > server.expireAt.getTime()))
-      minExpr = server.expireAt;
+    if (notOr(minExp, minExp?.getTime() > server.exp.getTime()))
+      minExp = server.exp;
 
-    return minExpr;
+    return minExp;
   }, null);
 
   if (!anotherMin || anotherMin.getTime() > max.getTime()) return max;
@@ -62,19 +63,20 @@ function calcMinExpr(servers, min, max) {
 
 export async function getFluxStatus() {
   const servers = await getServers(process.env.FLUX_APP_NAME);
-
-  const minPeriod = +process.env.MIN_PERIOD || 1800;
-  const maxPeriod = +process.env.MAX_PERIOD || 10800;
-  const minExprThreshold = new Date(Date.now() + minPeriod * 1000);
-  const maxExprThreshold = new Date(Date.now() + maxPeriod * 1000);
-  const expr = calcMinExpr(servers, minExprThreshold, maxExprThreshold);
+  const minPeriod = +process.env.MIN_LENGTH_OF_PERIOD || 1800;
+  const maxPeriod = +process.env.MAX_LENGTH_OF_PERIOD || 10800;
+  const minExpThreshold = new Date(Date.now() + minPeriod * 1000);
+  const maxExpThreshold = new Date(Date.now() + maxPeriod * 1000);
+  const exp = calcMinExp(servers, minExpThreshold, maxExpThreshold);
 
   for (const server of servers) {
     const response_time = await getServerResponseTime({
       ip: server.ip,
       port: process.env.FLUX_APP_PORT,
+      count: +process.env.REQ_COUNT || 5,
+      max: +process.env.REQ_TIMEOUT || 300_000,
     });
     server.response_time = response_time;
   }
-  return { servers, expr };
+  return { servers, exp };
 }

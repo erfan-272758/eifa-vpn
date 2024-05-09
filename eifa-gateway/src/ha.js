@@ -1,6 +1,6 @@
 import fs from "fs";
 import { lcm } from "mathjs";
-import exec from "./exec";
+import exec from "./exec.js";
 
 const default_cfg = `
 global
@@ -69,7 +69,7 @@ frontend my_frontend
     let backend_cfg = `
 backend my_backend`;
     for (const [i, server] of this.servers.entries()) {
-      cfg += `
+      backend_cfg += `
     server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}
     `;
     }
