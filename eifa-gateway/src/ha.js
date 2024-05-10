@@ -4,39 +4,30 @@ import exec from "./exec.js";
 
 const default_cfg = `
 global
-        log /dev/log    local0
-        log /dev/log    local1 notice
-        chroot /var/lib/haproxy
-        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-        stats timeout 30s
-        user haproxy
-        group haproxy
-        daemon
-
-        # Default SSL material locations
-        ca-base /etc/ssl/certs
-        crt-base /etc/ssl/private
-
-        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
-        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
-        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
-        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+    stats socket /var/lib/haproxy/stats
+    pidfile /var/run/haproxy.pid
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
 
 defaults
-        log     global
-        mode    http
-        option  httplog
-        option  dontlognull
-        timeout connect 5000
-        timeout client  50000
-        timeout server  50000
-        errorfile 400 /etc/haproxy/errors/400.http
-        errorfile 403 /etc/haproxy/errors/403.http
-        errorfile 408 /etc/haproxy/errors/408.http
-        errorfile 500 /etc/haproxy/errors/500.http
-        errorfile 502 /etc/haproxy/errors/502.http
-        errorfile 503 /etc/haproxy/errors/503.http
-        errorfile 504 /etc/haproxy/errors/504.http
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    retries                 10
+    timeout http-request    5m
+    timeout queue           5m
+    timeout connect         5m
+    timeout client          5m
+    timeout server          5m
+    timeout http-keep-alive 5m
+    timeout check           5m
+    maxconn                 30000 
 `;
 
 export default class HA {
@@ -67,7 +58,8 @@ frontend my_frontend
 
     // backend
     let backend_cfg = `
-backend my_backend`;
+backend my_backend
+  balance     roundrobin`;
     for (const [i, server] of this.servers.entries()) {
       backend_cfg += `
     server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}
@@ -88,7 +80,7 @@ backend my_backend`;
   }
   async reloadHA() {
     await exec(
-      "haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy/haproxy.pid -sf $(cat /var/run/haproxy/haproxy.pid)"
+      "haproxy -f /etc/haproxy/haproxy.cfg -sf $(cat /var/run/haproxy.pid)"
     );
   }
 
