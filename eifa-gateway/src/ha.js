@@ -61,7 +61,8 @@ backend my_backend
   balance     roundrobin`;
     for (const [i, server] of this.servers.entries()) {
       backend_cfg += `
-    server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}`;
+    server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}
+`;
     }
 
     console.log("[HA] new backend\n", backend_cfg);
