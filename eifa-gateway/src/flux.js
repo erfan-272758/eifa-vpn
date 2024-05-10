@@ -33,7 +33,7 @@ async function getServerResponseTime({ ip, port, count = 5, max = 300_000 }) {
   for (let i = 0; i < count; i++) {
     try {
       const start = Date.now();
-      console.log(`curl to http://${ip}:${port}`);
+      console.log(`curl to http://${ip}:${port} , ${i + 1}`);
       await axios.get(`http://${ip}:${port}`, { timeout: max });
       const end = Date.now();
       response_times.push(end - start);
