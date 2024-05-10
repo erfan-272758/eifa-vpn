@@ -74,7 +74,11 @@ backend my_backend
         "/etc/haproxy/haproxy.cfg",
         "/etc/haproxy/haproxy.cfg.bk"
       );
-    await fs.promises.writeFile("/etc/haproxy/haproxy.cfg", cfg, "utf8");
+    await fs.promises.writeFile(
+      "/etc/haproxy/haproxy.cfg",
+      cfg.trimEnd(),
+      "utf8"
+    );
   }
   async reloadHA() {
     await exec(
