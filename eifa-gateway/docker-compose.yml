@@ -7,4 +7,6 @@ services:
       - ./.env.local
     network_mode: host
     restart: always
+    volumes:
+      - ./haproxy:/etc/haproxy
 
