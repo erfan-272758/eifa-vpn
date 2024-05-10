@@ -88,7 +88,7 @@ backend my_backend`;
   }
   async reloadHA() {
     await exec(
-      "haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy/haproxy.pid -sf $(cat /var/run/haproxy.pid)"
+      "haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy/haproxy.pid -sf $(cat /var/run/haproxy/haproxy.pid)"
     );
   }
 
