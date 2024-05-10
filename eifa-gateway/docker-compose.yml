@@ -5,7 +5,6 @@ services:
       context: .
     env_file:
       - ./.env.local
-    networks:
-      - host
+    network_mode: host
     restart: always
 
