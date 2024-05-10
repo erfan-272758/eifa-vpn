@@ -68,6 +68,9 @@ backend my_backend
     console.log("[HA] new backend\n", backend_cfg);
     cfg += backend_cfg;
 
+    cfg.trimEnd();
+    if (cfg[cfg.length - 1] !== "\n") cfg += "\n";
+
     // write
     // backup
     if (fs.existsSync("/etc/haproxy/haproxy.cfg"))
@@ -75,11 +78,8 @@ backend my_backend
         "/etc/haproxy/haproxy.cfg",
         "/etc/haproxy/haproxy.cfg.bk"
       );
-    await fs.promises.writeFile(
-      "/etc/haproxy/haproxy.cfg",
-      cfg.trimEnd(),
-      "utf8"
-    );
+
+    await fs.promises.writeFile("/etc/haproxy/haproxy.cfg", cfg, "utf8");
   }
   async reloadHA() {
     await exec(
