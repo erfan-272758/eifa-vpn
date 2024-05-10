@@ -6,8 +6,7 @@ const default_cfg = `
 global
     stats socket /var/lib/haproxy/stats
     pidfile /var/run/haproxy.pid
-    log /dev/log local0
-    log /dev/log local1 notice
+    log 127.0.0.1 local2
     chroot /var/lib/haproxy
     stats timeout 30s
     user haproxy
