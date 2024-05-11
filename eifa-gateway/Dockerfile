@@ -6,4 +6,4 @@ COPY ./package* /app/
 RUN npm ci
 COPY . .
 COPY ./docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT [ "docker-entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
