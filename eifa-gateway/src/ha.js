@@ -15,7 +15,7 @@ global
 
 defaults
     log     global
-    mode    http
+    mode    tcp
     option  httplog
     option  dontlognull
     retries                 10

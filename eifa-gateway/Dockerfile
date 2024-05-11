@@ -5,4 +5,5 @@ WORKDIR /app
 COPY ./package* /app/
 RUN npm ci
 COPY . .
-CMD [ "index" ]
+COPY ./docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT [ "docker-entrypoint.sh" ]
