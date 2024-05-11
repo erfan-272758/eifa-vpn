@@ -16,7 +16,7 @@ global
 defaults
     log     global
     mode    tcp
-    option  httplog
+    option  tcplog
     option  dontlognull
     retries                 10
     timeout http-request    5m
