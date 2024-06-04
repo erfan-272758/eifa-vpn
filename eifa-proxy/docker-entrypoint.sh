@@ -4,6 +4,14 @@ set -e
 
 /usr/sbin/nginx -g "daemon off;" &
 
+IFS=',' read -ra IPS <<< "$ALLOW_IP"
+ALLOW=""
+for IP in "${IPS[@]}"
+do
+    ALLOW+="ALLOW $IP"$'\n'
+done
+
+
 cat > /etc/tinyproxy/tinyproxy.conf <<EOF
 User root
 Group root
@@ -17,7 +25,7 @@ PidFile "/run/tinyproxy/tinyproxy.pid"
 MaxClients 100
 Allow 127.0.0.1
 Allow ::1
-Allow $ALLOW_IP
+$ALLOW
 ViaProxyName "tinyproxy"
 ConnectPort 443
 ConnectPort 563
