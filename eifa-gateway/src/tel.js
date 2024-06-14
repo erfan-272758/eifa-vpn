@@ -14,7 +14,7 @@ export async function sendTelNotif(msg, servers) {
       serverProxyBasicAuthHeader,
     });
 
-  const fastestServer = servers.reduce((curr, prev) => {
+  const fastestServer = servers.reduce((prev, curr) => {
     if (!prev || prev.response_time > curr.response_time) return curr;
     return prev;
   }, null);
