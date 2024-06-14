@@ -1,6 +1,7 @@
 import "./src/loadEnv.js";
 import { getFluxStatus } from "./src/flux.js";
 import HA from "./src/ha.js";
+import Monitoring from "./src/monitoring.js";
 
 async function main() {
   console.log("call at", new Date());
@@ -13,7 +14,11 @@ async function main() {
     exp = fluxStatus.exp;
     console.log({ servers, exp });
     const ha = new HA(servers);
-    await ha.reConfigHA();
+    // await ha.reConfigHA();
+
+    // alert
+    const monitoring = new Monitoring(servers);
+    monitoring.alert();
   } catch (err) {
     console.error("[main]", err);
   }

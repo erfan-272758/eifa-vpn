@@ -8,7 +8,7 @@ IFS=',' read -ra IPS <<< "$ALLOW_IP"
 ALLOW=""
 for IP in "${IPS[@]}"
 do
-    ALLOW+="ALLOW $IP"$'\n'
+    ALLOW+="Allow $IP"$'\n'
 done
 
 
@@ -29,8 +29,14 @@ $ALLOW
 ViaProxyName "tinyproxy"
 ConnectPort 443
 ConnectPort 563
+ConnectPort 80
 EOF
 
+# restart tinyproxy ==> listen on 8080
 /etc/init.d/tinyproxy restart
 
+# start proxy server ==> listen on 8081
+/usr/local/bin/proxy-server &
+
+# start sshd ==> listen on 22
 /usr/sbin/sshd -D 
