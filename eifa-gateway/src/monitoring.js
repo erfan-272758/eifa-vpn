@@ -8,7 +8,6 @@ export default class Monitoring {
 
   alert() {
     try {
-      console.log("alert call");
       //   check threshold
       let responseTimeWaterMark = getEnv("response_time_water_mark");
       let serverTimeoutCount = getEnv("server_timeout_count");
@@ -18,10 +17,6 @@ export default class Monitoring {
         responseTimeWaterMark === undefined ||
         serverTimeoutCount === undefined
       ) {
-        console.log("configs not found", {
-          responseTimeWaterMark,
-          serverTimeoutCount,
-        });
         return;
       }
 
@@ -48,8 +43,7 @@ export default class Monitoring {
       );
 
       // send
-      console.log("bot call");
-      sendTelNotif(msgs.join("\n")).catch((err) =>
+      sendTelNotif(msgs.join("\n"), this.servers).catch((err) =>
         console.error(
           `[${new Date().toISOString()}] [monitoring] [telbot]`,
           err

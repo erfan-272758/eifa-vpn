@@ -1,27 +1,45 @@
-import { Telegraf } from "telegraf";
+import axios from "axios";
 import { getEnv } from "./loadEnv.js";
 import { tryCount } from "./tryCount.js";
-import { HttpsProxyAgent } from "https-proxy-agent";
 
-export async function sendTelNotif(msg) {
+export async function sendTelNotif(msg, servers) {
   const telbotToken = getEnv("telbot-token");
   const telbotChannel = getEnv("telbot-channel");
-  const telbotHttpsProxy = getEnv("telbot-https-proxy");
+  const serverProxyBasicAuthHeader = getEnv("SERVER_PROXY_BASIC_AUTH");
 
-  if (!telbotToken || !telbotChannel)
+  if (!telbotToken || !telbotChannel || !serverProxyBasicAuthHeader)
     return console.log("[telbot] not set configs correctly", {
       telbotChannel,
       telbotToken,
+      serverProxyBasicAuthHeader,
     });
 
-  let agent;
-  if (telbotHttpsProxy) agent = new HttpsProxyAgent(telbotHttpsProxy);
+  const fastestServer = servers.reduce((curr, prev) => {
+    if (!prev || prev.response_time > curr.response_time) return curr;
+    return prev;
+  }, null);
 
   await tryCount(async () => {
-    console.log("in try catch bot", { msg, agent });
-    const bot = new Telegraf(telbotToken, {
-      //   telegram: { agent },
-    });
-    await bot.telegram.sendMessage(telbotChannel, msg, { parse_mode: "HTML" });
-  }, 1);
+    const data = {
+      url: `https://api.telegram.org/bot${telbotToken}/sendMessage`,
+      method: "POST",
+      body: {
+        chat_id: telbotChannel,
+        text: msg,
+        parse_mode: "HTML",
+      },
+    };
+
+    const config = {
+      method: "get",
+      url: `http://${fastestServer.ip}:32001/proxy`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${serverProxyBasicAuthHeader}`,
+      },
+      data: data,
+    };
+
+    await axios(config);
+  }, 5);
 }
