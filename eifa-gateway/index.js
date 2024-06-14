@@ -14,7 +14,7 @@ async function main() {
     exp = fluxStatus.exp;
     console.log({ servers, exp });
     const ha = new HA(servers);
-    // await ha.reConfigHA();
+    await ha.reConfigHA();
 
     // alert
     const monitoring = new Monitoring(servers);
