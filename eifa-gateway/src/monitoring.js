@@ -26,7 +26,7 @@ export default class Monitoring {
       const fireServers = this.servers.filter(
         (server) => server.response_time >= responseTimeWaterMark
       );
-      if (fireServers.length < serverTimeoutCount) return;
+      if (fireServers.length <= serverTimeoutCount) return;
 
       const msgs = [];
 
