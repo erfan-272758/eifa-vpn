@@ -50,20 +50,35 @@ export default class HA {
 
     // add front
     cfg += `
-frontend my_frontend
+frontend plain_front
     bind *:${process.env.HA_FRONT_PORT ?? "8080"}
-    default_backend my_backend
+    default_backend plain_backend
+frontend ssl_front
+    bind *:${process.env.HA_SSL_FRONT_PORT ?? "8081"}
+    default_backend ssl_backend
     `;
 
     // backend
-    let backend_cfg = `
-backend my_backend
+    let backend_cfg = "";
+    let plain_backend = `
+backend plain_backend
   balance     roundrobin`;
     for (const [i, server] of this.servers.entries()) {
-      backend_cfg += `
+      plain_backend += `
     server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}
 `;
     }
+
+    let ssl_backend = `
+backend ssl_backend
+  balance     roundrobin`;
+    for (const [i, server] of this.servers.entries()) {
+      ssl_backend += `
+    server backend${i} ${server.ip}:${process.env.HA_SSL_BACKEND_PORT} weight ${server.weight} ssl ca-file /etc/haproxy/ca.crt
+`;
+    }
+
+    backend_cfg.concat(plain_backend, ssl_backend);
 
     console.log("[HA] new backend\n", backend_cfg);
     cfg += backend_cfg;

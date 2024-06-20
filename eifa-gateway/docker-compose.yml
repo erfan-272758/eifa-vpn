@@ -8,5 +8,5 @@ services:
     network_mode: host
     restart: always
     volumes:
-      - ./haproxy/haproxy.cfg:/etc/haproxy/haproxy.cfg
+      - ./haproxy:/etc/haproxy
 
