@@ -26,7 +26,7 @@ MaxClients 100
 Allow 127.0.0.1
 Allow ::1
 $ALLOW
-ViaProxyName "tinyproxy"
+DisableViaHeader yes
 ConnectPort 443
 ConnectPort 563
 ConnectPort 80
@@ -37,6 +37,11 @@ EOF
 
 # start proxy server ==> listen on 8081
 /usr/local/bin/proxy-server &
+
+# start stunnel server ==> listen on 8082
+mkdir -p /var/run/stunnel
+touch /var/run/stunnel/stunnel.pid
+service start stunnel4
 
 # start sshd ==> listen on 22
 /usr/sbin/sshd -D 
