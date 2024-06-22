@@ -41,7 +41,7 @@ EOF
 # start stunnel server ==> listen on 8082
 mkdir -p /var/run/stunnel
 touch /var/run/stunnel/stunnel.pid
-service start stunnel4
+service stunnel4 start
 
 # start sshd ==> listen on 22
 /usr/sbin/sshd -D 
