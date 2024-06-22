@@ -62,7 +62,7 @@ frontend ssl_front
     let backend_cfg = "";
     let plain_backend = `
 backend plain_backend
-  balance     roundrobin`;
+    balance     roundrobin`;
     for (const [i, server] of this.servers.entries()) {
       plain_backend += `
     server backend${i} ${server.ip}:${process.env.HA_BACKEND_PORT} weight ${server.weight}
@@ -71,14 +71,14 @@ backend plain_backend
 
     let ssl_backend = `
 backend ssl_backend
-  balance     roundrobin`;
+    balance     roundrobin`;
     for (const [i, server] of this.servers.entries()) {
       ssl_backend += `
     server backend${i} ${server.ip}:${process.env.HA_SSL_BACKEND_PORT} weight ${server.weight} ssl ca-file /etc/haproxy/ca.crt
 `;
     }
 
-    backend_cfg.concat(plain_backend, ssl_backend);
+    backend_cfg = backend_cfg.concat(plain_backend, ssl_backend);
 
     console.log("[HA] new backend\n", backend_cfg);
     cfg += backend_cfg;
